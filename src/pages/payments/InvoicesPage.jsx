@@ -9,10 +9,6 @@ import { EmptyState } from '../../components/ui/EmptyState'
 import { invoices } from '../../utils/mockData'
 import { formatCurrency, formatDate } from '../../utils/formatters'
 
-/* ---------------------------------- */
-/* Page Component (THIS WAS MISSING) */
-/* ---------------------------------- */
-
 export function InvoicesPage() {
   return (
     <div className="space-y-6">
@@ -22,10 +18,6 @@ export function InvoicesPage() {
     </div>
   )
 }
-
-/* ---------------------------------- */
-/* Sub Components */
-/* ---------------------------------- */
 
 function Header() {
   return (
@@ -57,7 +49,7 @@ function Filters() {
   )
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status }) {
   switch (status) {
     case 'paid':
       return <Badge variant="success">Paid</Badge>
@@ -70,25 +62,19 @@ function StatusBadge({ status }: { status: string }) {
   }
 }
 
-function InvoiceRow({ invoice }: { invoice: any }) {
+function InvoiceRow({ invoice }) {
   const columns = [
     {
       key: 'id',
       header: 'Invoice ID',
-      render: () => (
-        <span className="font-mono text-primary-400">
-          #{invoice.id}
-        </span>
-      ),
+      render: () => <span className="font-mono text-primary-400">#{invoice.id}</span>,
     },
     {
       key: 'tenant',
       header: 'Tenant',
       render: () => (
         <div>
-          <p className="font-medium text-white">
-            {invoice.tenantName}
-          </p>
+          <p className="font-medium text-white">{invoice.tenantName}</p>
           <p className="text-sm text-slate-400">
             {invoice.propertyName} • Unit {invoice.unitNumber}
           </p>
@@ -98,11 +84,7 @@ function InvoiceRow({ invoice }: { invoice: any }) {
     {
       key: 'amount',
       header: 'Amount',
-      render: () => (
-        <span className="font-semibold text-white">
-          {formatCurrency(invoice.amount)}
-        </span>
-      ),
+      render: () => <span className="font-semibold text-white">{formatCurrency(invoice.amount)}</span>,
     },
     {
       key: 'dueDate',
@@ -121,14 +103,7 @@ function InvoiceRow({ invoice }: { invoice: any }) {
     },
   ]
 
-  return (
-    <Table
-      columns={columns}
-      data={[invoice]}
-      keyExtractor={() => invoice.id}
-      onRowClick={() => {}}
-    />
-  )
+  return <Table columns={columns} data={[invoice]} keyExtractor={() => invoice.id} onRowClick={() => {}} />
 }
 
 function InvoiceList() {

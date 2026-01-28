@@ -29,7 +29,6 @@ export function PaymentsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
 
-  // Safe filtered payments
   const filteredPayments = payments.filter((payment) => {
     const tenant = String(payment.tenantName ?? '')
     const property = String(payment.propertyName ?? '')
@@ -43,7 +42,6 @@ export function PaymentsPage() {
     return matchesSearch && matchesStatus
   })
 
-  // Payment stats
   const totalCollected = payments
     .filter((p) => p.status === 'paid')
     .reduce((sum, p) => sum + (p.amount ?? 0), 0)
@@ -54,8 +52,7 @@ export function PaymentsPage() {
     .filter((p) => p.status === 'overdue')
     .reduce((sum, p) => sum + (p.amount ?? 0), 0)
 
-  // Status badge
-  const getStatusBadge = (status?: string) => {
+  const getStatusBadge = (status) => {
     switch (status) {
       case 'paid':
         return <Badge variant="success">Paid</Badge>
@@ -70,12 +67,11 @@ export function PaymentsPage() {
     }
   }
 
-  // Table columns
   const columns = [
     {
       key: 'tenant',
       header: 'Tenant',
-      render: (payment: typeof payments[0]) => (
+      render: (payment) => (
         <div>
           <p className="font-medium text-white">{payment.tenantName ?? '-'}</p>
           <p className="text-sm text-slate-400">
@@ -87,49 +83,39 @@ export function PaymentsPage() {
     {
       key: 'amount',
       header: 'Amount',
-      render: (payment: typeof payments[0]) => (
-        <span className="font-semibold text-white">
-          {formatCurrency(payment.amount ?? 0)}
-        </span>
+      render: (payment) => (
+        <span className="font-semibold text-white">{formatCurrency(payment.amount ?? 0)}</span>
       ),
     },
     {
       key: 'dueDate',
       header: 'Due Date',
-      render: (payment: typeof payments[0]) =>
-        payment.dueDate ? formatDate(payment.dueDate) : '-',
+      render: (payment) => (payment.dueDate ? formatDate(payment.dueDate) : '-'),
     },
     {
       key: 'paidDate',
       header: 'Paid Date',
-      render: (payment: typeof payments[0]) =>
-        payment.paidDate ? formatDate(payment.paidDate) : '-',
+      render: (payment) => (payment.paidDate ? formatDate(payment.paidDate) : '-'),
     },
     {
       key: 'method',
       header: 'Method',
-      render: (payment: typeof payments[0]) => (
-        <span className="capitalize text-slate-300">
-          {payment.method ?? '-'}
-        </span>
-      ),
+      render: (payment) => <span className="capitalize text-slate-300">{payment.method ?? '-'}</span>,
     },
     {
       key: 'status',
       header: 'Status',
-      render: (payment: typeof payments[0]) => getStatusBadge(payment.status),
+      render: (payment) => getStatusBadge(payment.status),
     },
   ]
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-white">Payments</h1>
         <p className="text-slate-400">Track and manage rent payments</p>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[totalCollected, totalPending, totalOverdue].map((amount, i) => {
           const icons = [
@@ -137,13 +123,8 @@ export function PaymentsPage() {
             <ClockIcon className="w-5 h-5 text-amber-400" />,
             <AlertCircleIcon className="w-5 h-5 text-red-400" />,
           ]
-          const bgColors = [
-            'bg-white/20',
-            'bg-amber-500/20',
-            'bg-red-500/20',
-          ]
+          const bgColors = ['bg-white/20', 'bg-amber-500/20', 'bg-red-500/20']
           const labels = ['Collected', 'Pending', 'Overdue']
-          const textColors = ['text-white', 'text-white', 'text-white']
           return (
             <motion.div
               key={i}
@@ -153,7 +134,9 @@ export function PaymentsPage() {
             >
               <Card variant={i === 0 ? 'gradient-teal' : undefined} className="p-5">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-lg ${bgColors[i]} flex items-center justify-center`}>
+                  <div
+                    className={`w-10 h-10 rounded-lg ${bgColors[i]} flex items-center justify-center`}
+                  >
                     {icons[i]}
                   </div>
                   <div>
@@ -166,12 +149,7 @@ export function PaymentsPage() {
           )
         })}
 
-        {/* Failed */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <Card className="p-5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-slate-500/20 flex items-center justify-center">
@@ -186,7 +164,6 @@ export function PaymentsPage() {
         </motion.div>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <Input
@@ -204,12 +181,7 @@ export function PaymentsPage() {
         />
       </div>
 
-      {/* Table */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
         <Table
           columns={columns}
           data={filteredPayments}

@@ -12,12 +12,10 @@ import { Badge } from '../../components/ui/Badge'
 import { Card, CardHeader, CardContent } from '../../components/ui/Card'
 import { formatCurrency, formatDate, formatDateTime } from '../../utils/formatters'
 
-/* ---------------------------------- */
-/* Page Component (ADDED) */
-/* ---------------------------------- */
+
 
 export function PaymentDetailPage() {
-  // temporary mock data (until API / route params)
+  
   const payment = {
     status: 'pending',
     amount: 1800,
@@ -58,9 +56,7 @@ export function PaymentDetailPage() {
   )
 }
 
-/* ---------------------------------- */
-/* Existing Components (UNCHANGED) */
-/* ---------------------------------- */
+
 
 function Header({ invoiceId }) {
   return (

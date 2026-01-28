@@ -16,10 +16,6 @@ import { RecentActivity } from '../components/dashboard/RecentActivity'
 import { dashboardStats } from '../utils/mockData'
 import { formatCurrency } from '../utils/formatters'
 
-/* ---------------------------------- */
-/* Page Component (THIS WAS MISSING) */
-/* ---------------------------------- */
-
 export function DashboardPage() {
   return (
     <div className="space-y-6">
@@ -30,10 +26,6 @@ export function DashboardPage() {
     </div>
   )
 }
-
-/* ---------------------------------- */
-/* Sub Components */
-/* ---------------------------------- */
 
 function DashboardHeader() {
   return (
@@ -91,13 +83,6 @@ function SecondaryStatsCard({
   delay,
   bgColor,
   iconColor,
-}: {
-  icon: React.ReactElement
-  value: number
-  label: string
-  delay: number
-  bgColor: string
-  iconColor: string
 }) {
   return (
     <motion.div
@@ -107,9 +92,7 @@ function SecondaryStatsCard({
       className="bg-surface-slate rounded-xl border border-slate-700/50 p-6"
     >
       <div className="flex items-center gap-3 mb-2">
-        <div
-          className={`w-10 h-10 rounded-lg ${bgColor} flex items-center justify-center`}
-        >
+        <div className={`w-10 h-10 rounded-lg ${bgColor} flex items-center justify-center`}>
           {React.cloneElement(icon, {
             className: `w-5 h-5 ${iconColor}`,
           })}

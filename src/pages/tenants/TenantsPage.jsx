@@ -10,28 +10,19 @@ import { Table } from '../../components/ui/Table'
 import { Avatar } from '../../components/ui/Avatar'
 import { tenants } from '../../utils/mockData'
 import { formatCurrency, formatPhone } from '../../utils/formatters'
+
 const statusOptions = [
-  {
-    value: '',
-    label: 'All Status',
-  },
-  {
-    value: 'paid',
-    label: 'Paid',
-  },
-  {
-    value: 'pending',
-    label: 'Pending',
-  },
-  {
-    value: 'overdue',
-    label: 'Overdue',
-  },
+  { value: '', label: 'All Status' },
+  { value: 'paid', label: 'Paid' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'overdue', label: 'Overdue' },
 ]
+
 export function TenantsPage() {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
+
   const filteredTenants = tenants.filter((tenant) => {
     const matchesSearch =
       tenant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -39,7 +30,8 @@ export function TenantsPage() {
     const matchesStatus = !statusFilter || tenant.paymentStatus === statusFilter
     return matchesSearch && matchesStatus
   })
-  const getStatusBadge = (status: string) => {
+
+  const getStatusBadge = (status) => {
     switch (status) {
       case 'paid':
         return <Badge variant="success">Paid</Badge>
@@ -51,11 +43,12 @@ export function TenantsPage() {
         return null
     }
   }
+
   const columns = [
     {
       key: 'name',
       header: 'Tenant',
-      render: (tenant: (typeof tenants)[0]) => (
+      render: (tenant) => (
         <div className="flex items-center gap-3">
           <Avatar src={tenant.avatar} name={tenant.name} size="sm" />
           <div>
@@ -68,12 +61,12 @@ export function TenantsPage() {
     {
       key: 'phone',
       header: 'Phone',
-      render: (tenant: (typeof tenants)[0]) => formatPhone(tenant.phone),
+      render: (tenant) => formatPhone(tenant.phone),
     },
     {
       key: 'property',
       header: 'Property',
-      render: (tenant: (typeof tenants)[0]) => (
+      render: (tenant) => (
         <div>
           <p className="text-white">{tenant.propertyName}</p>
           <p className="text-sm text-slate-400">Unit {tenant.unitNumber}</p>
@@ -83,27 +76,24 @@ export function TenantsPage() {
     {
       key: 'rentAmount',
       header: 'Rent',
-      render: (tenant: (typeof tenants)[0]) =>
-        formatCurrency(tenant.rentAmount),
+      render: (tenant) => formatCurrency(tenant.rentAmount),
     },
     {
       key: 'paymentStatus',
       header: 'Status',
-      render: (tenant: (typeof tenants)[0]) =>
-        getStatusBadge(tenant.paymentStatus),
+      render: (tenant) => getStatusBadge(tenant.paymentStatus),
     },
     {
       key: 'balance',
       header: 'Balance',
-      render: (tenant: (typeof tenants)[0]) => (
-        <span
-          className={tenant.balance > 0 ? 'text-red-400' : 'text-emerald-400'}
-        >
+      render: (tenant) => (
+        <span className={tenant.balance > 0 ? 'text-red-400' : 'text-emerald-400'}>
           {formatCurrency(tenant.balance)}
         </span>
       ),
     },
   ]
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -134,16 +124,7 @@ export function TenantsPage() {
       </div>
 
       {/* Table */}
-      <motion.div
-        initial={{
-          opacity: 0,
-          y: 20,
-        }}
-        animate={{
-          opacity: 1,
-          y: 0,
-        }}
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <Table
           columns={columns}
           data={filteredTenants}

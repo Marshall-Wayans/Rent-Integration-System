@@ -9,7 +9,7 @@ import { Avatar } from '../../components/ui/Avatar'
 import { maintenanceRequests } from '../../utils/mockData'
 import { formatDateTime, formatRelativeTime } from '../../utils/formatters'
 
-// Status options
+
 const statusOptions = [
   { value: 'open', label: 'Open' },
   { value: 'in_progress', label: 'In Progress' },
@@ -17,7 +17,7 @@ const statusOptions = [
   { value: 'closed', label: 'Closed' },
 ]
 
-// Header Component
+
 function Header({ request, status, onBack }) {
   const getPriorityBadge = (priority) => {
     switch (priority) {
@@ -56,7 +56,7 @@ function Header({ request, status, onBack }) {
   )
 }
 
-// Description Card Component
+
 function DescriptionCard({ description }) {
   return (
     <Card>
@@ -70,7 +70,7 @@ function DescriptionCard({ description }) {
   )
 }
 
-// Timeline Component
+
 function Timeline({ comments, newComment, setNewComment, handleAddComment, createdAt }) {
   return (
     <Card>
@@ -122,7 +122,7 @@ function Timeline({ comments, newComment, setNewComment, handleAddComment, creat
   )
 }
 
-// Sidebar Component
+
 function Sidebar({ request, status, setStatus, assignedTo, setAssignedTo, handleUpdateRequest }) {
   return (
     <div className="space-y-6">
@@ -175,7 +175,7 @@ function Sidebar({ request, status, setStatus, assignedTo, setAssignedTo, handle
   )
 }
 
-// Main Component
+
 function MaintenanceDetailPageWrapper() {
   const { id } = useParams()
   const navigate = useNavigate()

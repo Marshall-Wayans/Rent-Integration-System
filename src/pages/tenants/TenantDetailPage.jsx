@@ -19,27 +19,26 @@ import { Tabs, TabPanel } from '../../components/ui/Tabs'
 import { Table } from '../../components/ui/Table'
 import { tenants, payments, maintenanceRequests } from '../../utils/mockData'
 import { formatCurrency, formatDate, formatPhone } from '../../utils/formatters'
+
 export function TenantDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const tenant = tenants.find((t) => t.id === id)
   const tenantPayments = payments.filter((p) => p.tenantId === id)
   const tenantMaintenance = maintenanceRequests.filter((m) => m.tenantId === id)
+
   if (!tenant) {
     return (
       <div className="text-center py-12">
         <p className="text-slate-400">Tenant not found</p>
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/tenants')}
-          className="mt-4"
-        >
+        <Button variant="ghost" onClick={() => navigate('/tenants')} className="mt-4">
           Back to Tenants
         </Button>
       </div>
     )
   }
-  const getStatusBadge = (status: string) => {
+
+  const getStatusBadge = (status) => {
     switch (status) {
       case 'paid':
         return <Badge variant="success">Paid</Badge>
@@ -51,59 +50,44 @@ export function TenantDetailPage() {
         return null
     }
   }
+
   const paymentColumns = [
     {
       key: 'invoiceId',
       header: 'Invoice',
-      render: (payment: (typeof payments)[0]) => `#${payment.invoiceId}`,
+      render: (payment) => `#${payment.invoiceId}`,
     },
     {
       key: 'amount',
       header: 'Amount',
-      render: (payment: (typeof payments)[0]) => formatCurrency(payment.amount),
+      render: (payment) => formatCurrency(payment.amount),
     },
     {
       key: 'dueDate',
       header: 'Due Date',
-      render: (payment: (typeof payments)[0]) => formatDate(payment.dueDate),
+      render: (payment) => formatDate(payment.dueDate),
     },
     {
       key: 'paidDate',
       header: 'Paid Date',
-      render: (payment: (typeof payments)[0]) =>
-        payment.paidDate ? formatDate(payment.paidDate) : '-',
+      render: (payment) => (payment.paidDate ? formatDate(payment.paidDate) : '-'),
     },
     {
       key: 'status',
       header: 'Status',
-      render: (payment: (typeof payments)[0]) => getStatusBadge(payment.status),
+      render: (payment) => getStatusBadge(payment.status),
     },
   ]
+
   const tabs = [
-    {
-      id: 'overview',
-      label: 'Overview',
-      icon: <HomeIcon className="w-4 h-4" />,
-    },
-    {
-      id: 'payments',
-      label: 'Payments',
-      icon: <DollarSignIcon className="w-4 h-4" />,
-    },
-    {
-      id: 'maintenance',
-      label: 'Maintenance',
-      icon: <WrenchIcon className="w-4 h-4" />,
-    },
-    {
-      id: 'documents',
-      label: 'Documents',
-      icon: <FileTextIcon className="w-4 h-4" />,
-    },
+    { id: 'overview', label: 'Overview', icon: <HomeIcon className="w-4 h-4" /> },
+    { id: 'payments', label: 'Payments', icon: <DollarSignIcon className="w-4 h-4" /> },
+    { id: 'maintenance', label: 'Maintenance', icon: <WrenchIcon className="w-4 h-4" /> },
+    { id: 'documents', label: 'Documents', icon: <FileTextIcon className="w-4 h-4" /> },
   ]
+
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="sm" onClick={() => navigate('/tenants')}>
           <ArrowLeftIcon className="w-4 h-4" />
@@ -122,8 +106,8 @@ export function TenantDetailPage() {
             tenant.paymentStatus === 'paid'
               ? 'success'
               : tenant.paymentStatus === 'pending'
-                ? 'warning'
-                : 'error'
+              ? 'warning'
+              : 'error'
           }
           size="md"
         >
@@ -131,7 +115,6 @@ export function TenantDetailPage() {
         </Badge>
       </div>
 
-      {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
@@ -139,63 +122,55 @@ export function TenantDetailPage() {
               <DollarSignIcon className="w-5 h-5 text-primary-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">
-                {formatCurrency(tenant.rentAmount)}
-              </p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(tenant.rentAmount)}</p>
               <p className="text-sm text-slate-400">Monthly Rent</p>
             </div>
           </div>
         </Card>
+
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
               <DollarSignIcon className="w-5 h-5 text-red-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">
-                {formatCurrency(tenant.balance)}
-              </p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(tenant.balance)}</p>
               <p className="text-sm text-slate-400">Balance Due</p>
             </div>
           </div>
         </Card>
+
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
               <CalendarIcon className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white">
-                {formatDate(tenant.leaseStart)}
-              </p>
+              <p className="text-lg font-bold text-white">{formatDate(tenant.leaseStart)}</p>
               <p className="text-sm text-slate-400">Lease Start</p>
             </div>
           </div>
         </Card>
+
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
               <CalendarIcon className="w-5 h-5 text-amber-400" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white">
-                {formatDate(tenant.leaseEnd)}
-              </p>
+              <p className="text-lg font-bold text-white">{formatDate(tenant.leaseEnd)}</p>
               <p className="text-sm text-slate-400">Lease End</p>
             </div>
           </div>
         </Card>
       </div>
 
-      {/* Tabs */}
       <Tabs tabs={tabs} defaultTab="overview">
         <TabPanel tabId="overview" activeTab="overview">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold text-white">
-                  Contact Information
-                </h3>
+                <h3 className="text-lg font-semibold text-white">Contact Information</h3>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-3">
@@ -221,9 +196,7 @@ export function TenantDetailPage() {
 
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold text-white">
-                  Lease Details
-                </h3>
+                <h3 className="text-lg font-semibold text-white">Lease Details</h3>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
@@ -237,15 +210,12 @@ export function TenantDetailPage() {
                 <div className="flex justify-between">
                   <span className="text-slate-400">Lease Period</span>
                   <span className="text-white">
-                    {formatDate(tenant.leaseStart)} -{' '}
-                    {formatDate(tenant.leaseEnd)}
+                    {formatDate(tenant.leaseStart)} - {formatDate(tenant.leaseEnd)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Monthly Rent</span>
-                  <span className="text-white">
-                    {formatCurrency(tenant.rentAmount)}
-                  </span>
+                  <span className="text-white">{formatCurrency(tenant.rentAmount)}</span>
                 </div>
               </CardContent>
             </Card>
@@ -255,9 +225,7 @@ export function TenantDetailPage() {
         <TabPanel tabId="payments" activeTab="overview">
           <Card>
             <CardHeader>
-              <h3 className="text-lg font-semibold text-white">
-                Payment History
-              </h3>
+              <h3 className="text-lg font-semibold text-white">Payment History</h3>
             </CardHeader>
             <CardContent className="p-0">
               <Table
@@ -273,15 +241,11 @@ export function TenantDetailPage() {
         <TabPanel tabId="maintenance" activeTab="overview">
           <Card>
             <CardHeader>
-              <h3 className="text-lg font-semibold text-white">
-                Maintenance Requests
-              </h3>
+              <h3 className="text-lg font-semibold text-white">Maintenance Requests</h3>
             </CardHeader>
             <CardContent className="space-y-4">
               {tenantMaintenance.length === 0 ? (
-                <p className="text-slate-400 text-center py-8">
-                  No maintenance requests
-                </p>
+                <p className="text-slate-400 text-center py-8">No maintenance requests</p>
               ) : (
                 tenantMaintenance.map((request) => (
                   <div
@@ -291,9 +255,7 @@ export function TenantDetailPage() {
                   >
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="font-medium text-white">
-                          {request.title}
-                        </p>
+                        <p className="font-medium text-white">{request.title}</p>
                         <p className="text-sm text-slate-400 mt-1">
                           {request.description.slice(0, 100)}...
                         </p>
@@ -303,8 +265,8 @@ export function TenantDetailPage() {
                           request.status === 'resolved'
                             ? 'success'
                             : request.status === 'in_progress'
-                              ? 'info'
-                              : 'warning'
+                            ? 'info'
+                            : 'warning'
                         }
                       >
                         {request.status.replace('_', ' ')}
@@ -323,9 +285,7 @@ export function TenantDetailPage() {
               <h3 className="text-lg font-semibold text-white">Documents</h3>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-400 text-center py-8">
-                No documents uploaded
-              </p>
+              <p className="text-slate-400 text-center py-8">No documents uploaded</p>
             </CardContent>
           </Card>
         </TabPanel>

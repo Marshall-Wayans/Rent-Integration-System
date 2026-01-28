@@ -11,7 +11,7 @@ import { EmptyState } from '../../components/ui/EmptyState'
 import { maintenanceRequests } from '../../utils/mockData'
 import { formatRelativeTime } from '../../utils/formatters'
 
-// Status and Priority options
+
 const statusOptions = [
   { value: '', label: 'All Status' },
   { value: 'open', label: 'Open' },
@@ -28,7 +28,7 @@ const priorityOptions = [
   { value: 'low', label: 'Low' },
 ]
 
-// Header Component
+
 function Header() {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -41,7 +41,7 @@ function Header() {
   )
 }
 
-// Filters Component
+
 function Filters({ searchQuery, setSearchQuery, statusFilter, setStatusFilter, priorityFilter, setPriorityFilter }) {
   return (
     <div className="flex flex-col sm:flex-row gap-4">
@@ -59,7 +59,7 @@ function Filters({ searchQuery, setSearchQuery, statusFilter, setStatusFilter, p
   )
 }
 
-// RequestCard Component
+
 function RequestCard({ request, index, onClick }) {
   const getPriorityBadge = (priority) => {
     switch (priority) {
@@ -113,7 +113,7 @@ function RequestCard({ request, index, onClick }) {
   )
 }
 
-// RequestList Component
+
 function RequestList({ filteredRequests, navigate }) {
   if (filteredRequests.length === 0) {
     return (
@@ -134,7 +134,7 @@ function RequestList({ filteredRequests, navigate }) {
   )
 }
 
-// Main Page Component
+
 function MaintenancePageWrapper() {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')

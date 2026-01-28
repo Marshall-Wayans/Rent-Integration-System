@@ -8,21 +8,21 @@ import { notifications } from '../utils/mockData'
 import { formatRelativeTime } from '../utils/formatters'
 
 // Icon and color mappings
-const iconMap: Record<string, React.ReactNode> = {
+const iconMap = {
   payment: <CreditCardIcon className="w-5 h-5" />,
   maintenance: <WrenchIcon className="w-5 h-5" />,
   lease: <FileTextIcon className="w-5 h-5" />,
   system: <SettingsIcon className="w-5 h-5" />,
 }
 
-const colorMap: Record<string, string> = {
+const colorMap = {
   payment: 'bg-emerald-500/20 text-emerald-400',
   maintenance: 'bg-amber-500/20 text-amber-400',
   lease: 'bg-primary-500/20 text-primary-400',
   system: 'bg-cyan-500/20 text-cyan-400',
 }
 
-function Header({ unreadCount, markAllAsRead }: { unreadCount: number; markAllAsRead: () => void }) {
+function Header({ unreadCount, markAllAsRead }) {
   return (
     <div className="flex items-center justify-between">
       <div>
@@ -41,15 +41,7 @@ function Header({ unreadCount, markAllAsRead }: { unreadCount: number; markAllAs
   )
 }
 
-function NotificationCard({
-  notification,
-  markAsRead,
-  deleteNotification,
-}: {
-  notification: typeof notifications[0]
-  markAsRead: (id: string) => void
-  deleteNotification: (id: string) => void
-}) {
+function NotificationCard({ notification, markAsRead, deleteNotification }) {
   return (
     <Card className={`p-4 ${!notification.read ? 'border-l-4 border-l-primary-500' : ''}`}>
       <div className="flex items-start gap-4">
@@ -89,15 +81,7 @@ function NotificationCard({
   )
 }
 
-function NotificationsList({
-  notificationList,
-  markAsRead,
-  deleteNotification,
-}: {
-  notificationList: typeof notifications
-  markAsRead: (id: string) => void
-  deleteNotification: (id: string) => void
-}) {
+function NotificationsList({ notificationList, markAsRead, deleteNotification }) {
   if (notificationList.length === 0) {
     return (
       <EmptyState
@@ -122,7 +106,7 @@ function NotificationsList({
   )
 }
 
-function NotificationsPageContent() {
+function NotificationsPage() {
   const [notificationList, setNotificationList] = useState(notifications)
   const unreadCount = notificationList.filter((n) => !n.read).length
 
@@ -130,16 +114,16 @@ function NotificationsPageContent() {
     setNotificationList((prev) => prev.map((n) => ({ ...n, read: true })))
   }
 
-  const markAsRead = (id: string) => {
+  const markAsRead = (id) => {
     setNotificationList((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)))
   }
 
-  const deleteNotification = (id: string) => {
+  const deleteNotification = (id) => {
     setNotificationList((prev) => prev.filter((n) => n.id !== id))
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-3xl p-6">
       <Header unreadCount={unreadCount} markAllAsRead={markAllAsRead} />
       <NotificationsList
         notificationList={notificationList}
@@ -150,5 +134,4 @@ function NotificationsPageContent() {
   )
 }
 
-export { NotificationsPageContent as NotificationsPage }
-
+export { NotificationsPage }

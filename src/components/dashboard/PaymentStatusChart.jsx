@@ -14,12 +14,8 @@ export function PaymentStatusChart() {
   return (
     <Card>
       <CardHeader>
-        <h3 className="text-lg font-semibold text-white">
-          Payment Status
-        </h3>
-        <p className="text-sm text-slate-400">
-          Current month breakdown
-        </p>
+        <h3 className="text-lg font-semibold text-white">Payment Status</h3>
+        <p className="text-sm text-slate-400">Current month breakdown</p>
       </CardHeader>
 
       <CardContent>
@@ -47,15 +43,13 @@ export function PaymentStatusChart() {
                   borderRadius: '8px',
                   color: '#f1f5f9',
                 }}
-                formatter={(value: number) => [`${value}%`, '']}
+                formatter={(value) => [`${value}%`, '']}
               />
 
               <Legend
                 verticalAlign="bottom"
                 formatter={(value) => (
-                  <span className="text-slate-300 text-sm">
-                    {value}
-                  </span>
+                  <span className="text-slate-300 text-sm">{value}</span>
                 )}
               />
             </PieChart>

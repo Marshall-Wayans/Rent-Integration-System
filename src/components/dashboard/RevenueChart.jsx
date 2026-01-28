@@ -15,12 +15,8 @@ export function RevenueChart() {
   return (
     <Card>
       <CardHeader>
-        <h3 className="text-lg font-semibold text-white">
-          Monthly Revenue
-        </h3>
-        <p className="text-sm text-slate-400">
-          Revenue vs Collected
-        </p>
+        <h3 className="text-lg font-semibold text-white">Monthly Revenue</h3>
+        <p className="text-sm text-slate-400">Revenue vs Collected</p>
       </CardHeader>
 
       <CardContent>
@@ -67,7 +63,7 @@ export function RevenueChart() {
                   borderRadius: '8px',
                   color: '#f1f5f9',
                 }}
-                formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
+                formatter={(value) => [`$${value.toLocaleString()}`, '']}
               />
 
               <Area

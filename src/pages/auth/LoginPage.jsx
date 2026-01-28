@@ -8,14 +8,14 @@ import { Button } from '../../components/ui/Button'
 
 function LoginPage() {
   const navigate = useNavigate()
-  const [showPassword, setShowPassword] = react.useState(false)
-  const [isLoading, setIsLoading] = react.useState(false)
-  const [formData, setFormData] = react.useState({
+  const [showPassword, setShowPassword] = React.useState(false)
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [formData, setFormData] = React.useState({
     email: '',
     password: '',
     rememberMe: false,
   })
-  const [errors, setErrors] = react.useState({})
+  const [errors, setErrors] = React.useState({})
 
   function validateForm() {
     const newErrors = {}
