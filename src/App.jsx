@@ -1,47 +1,44 @@
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { ToastProvider } from "./components/ui/Toast";
-import { AppLayout } from "./components/layout/AppLayout";
-import { LoginPage } from "./pages/auth/LoginPage";
-import { RegisterPage } from "./pages/auth/RegisterPage";
-import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
-import { DashboardPage } from "./pages/DashboardPage";
-import { PropertiesPage } from "./pages/properties/PropertiesPage";
-import { PropertyDetailPage } from "./pages/properties/PropertyDetailPage";
-import { AddPropertyPage } from "./pages/properties/AddPropertyPage";
-import { TenantsPage } from "./pages/tenants/TenantsPage";
-import { TenantDetailPage } from "./pages/tenants/TenantDetailPage";
-import { PaymentsPage } from "./pages/payments/PaymentsPage";
-import { PaymentDetailPage } from "./pages/payments/PaymentDetailPage";
-import { InvoicesPage } from "./pages/payments/InvoicesPage";
-import { MaintenancePage } from "./pages/maintenance/MaintenancePage";
-import { MaintenanceDetailPage } from "./pages/maintenance/MaintenanceDetailPage";
-import { NotificationsPage } from "./pages/NotificationsPage";
-import { SettingsPage } from "./pages/SettingsPage";
+import React from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { ToastProvider } from './components/ui/Toast'
+import { AppLayout } from './components/layout/AppLayout'
+import { LoginPage } from './pages/auth/LoginPage'
+import { RegisterPage } from './pages/auth/RegisterPage'
+import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage'
+import { DashboardPage } from './pages/DashboardPage'
+import { PropertiesPage } from './pages/properties/PropertiesPage'
+import { PropertyDetailPage } from './pages/properties/PropertyDetailPage'
+import { AddPropertyPage } from './pages/properties/AddPropertyPage'
+import { TenantsPage } from './pages/tenants/TenantsPage'
+import { TenantDetailPage } from './pages/tenants/TenantDetailPage'
+import { PaymentsPage } from './pages/payments/PaymentsPage'
+import { PaymentDetailPage } from './pages/payments/PaymentDetailPage'
+import { InvoicesPage } from './pages/payments/InvoicesPage'
+import { MaintenancePage } from './pages/maintenance/MaintenancePage'
+import { MaintenanceDetailPage } from './pages/maintenance/MaintenanceDetailPage'
+import { NotificationsPage } from './pages/NotificationsPage'
+import { SettingsPage } from './pages/SettingsPage'
 
-const isAuthenticated = () => {
-  return !!localStorage.getItem("token");
-};
+// Protected Route Component
+function ProtectedRoute({ children }) {
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
+  if (!isAuthenticated) return <Navigate to="/login" replace />
+  return children
+}
 
-const ProtectedRoute = ({ children }) => {
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-};
+// Public Route Component
+function PublicRoute({ children }) {
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
+  if (isAuthenticated) return <Navigate to="/" replace />
+  return children
+}
 
-const PublicRoute = ({ children }) => {
-  if (isAuthenticated()) {
-    return <Navigate to="/" replace />;
-  }
-  return children;
-};
-
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <ToastProvider />
       <Routes>
+        {/* Auth Routes */}
         <Route
           path="/login"
           element={
@@ -69,6 +66,7 @@ function App() {
           }
         />
 
+        {/* Protected Routes */}
         <Route
           element={
             <ProtectedRoute>
@@ -91,10 +89,9 @@ function App() {
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
-  );
+  )
 }
-
-export default App;

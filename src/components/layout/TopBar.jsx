@@ -1,5 +1,5 @@
-import React, { useState, Fragment } from 'react'
-import { useLocation, Link } from 'react-router-dom'
+import React, { useEffect, useState, Fragment } from 'react'
+import { useLocation, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BellIcon,
@@ -9,38 +9,109 @@ import {
   UserIcon,
   SettingsIcon,
 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Avatar } from '../ui/Avatar'
-import { currentUser, notifications } from '../../utils/mockData'
+import { notifications } from '../../utils/mockData'
 
-function TopBar() {
+const pathNames = {
+  '/': 'Dashboard',
+  '/properties': 'Properties',
+  '/tenants': 'Tenants',
+  '/payments': 'Payments',
+  '/invoices': 'Invoices',
+  '/maintenance': 'Maintenance',
+  '/notifications': 'Notifications',
+  '/settings': 'Settings',
+}
+
+export function TopBar() {
   const location = useLocation()
+  const navigate = useNavigate()
+
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
 
-  const pathNames = {
-    '/': 'Dashboard',
-    '/properties': 'Properties',
-    '/tenants': 'Tenants',
-    '/payments': 'Payments',
-    '/invoices': 'Invoices',
-    '/maintenance': 'Maintenance',
-    '/notifications': 'Notifications',
-    '/settings': 'Settings',
-  }
+  // Dynamic user data from localStorage
+  const [userData, setUserData] = useState({
+    name: 'User',
+    email: localStorage.getItem('userEmail') || 'user@example.com',
+    role: 'owner',
+    avatar: '',
+  })
+
+  // Load user data from localStorage
+  useEffect(() => {
+    const loadUserData = () => {
+      const savedProfile = localStorage.getItem('userProfile')
+      const savedPhoto = localStorage.getItem('userPhoto')
+      const userEmail = localStorage.getItem('userEmail')
+
+      if (savedProfile) {
+        const profile = JSON.parse(savedProfile)
+        setUserData((prev) => ({
+          ...prev,
+          name: profile.name || 'User',
+          email: profile.email || userEmail || 'user@example.com',
+        }))
+      } else if (userEmail) {
+        setUserData((prev) => ({
+          ...prev,
+          email: userEmail,
+        }))
+      }
+
+      if (savedPhoto) {
+        setUserData((prev) => ({
+          ...prev,
+          avatar: savedPhoto,
+        }))
+      }
+    }
+
+    loadUserData()
+
+    const handleStorageChange = () => {
+      loadUserData()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('userDataUpdated', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('userDataUpdated', handleStorageChange)
+    }
+  }, [])
 
   const pathSegments = location.pathname.split('/').filter(Boolean)
   const unreadCount = notifications.filter((n) => !n.read).length
 
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated')
+    localStorage.removeItem('userEmail')
+    localStorage.removeItem('rememberMe')
+
+    toast.success('Logged out successfully')
+    navigate('/login')
+  }
+
   const getBreadcrumbs = () => {
     const crumbs = [{ path: '/', label: 'Home' }]
     let currentPath = ''
+
     pathSegments.forEach((segment) => {
       currentPath += `/${segment}`
+
       const label =
         pathNames[currentPath] ||
         segment.charAt(0).toUpperCase() + segment.slice(1)
-      crumbs.push({ path: currentPath, label })
+
+      crumbs.push({
+        path: currentPath,
+        label,
+      })
     })
+
     return crumbs
   }
 
@@ -52,7 +123,10 @@ function TopBar() {
       <nav className="flex items-center gap-2 text-sm">
         {breadcrumbs.map((crumb, index) => (
           <Fragment key={crumb.path}>
-            {index > 0 && <ChevronRightIcon className="w-4 h-4 text-slate-500" />}
+            {index > 0 && (
+              <ChevronRightIcon className="w-4 h-4 text-slate-500" />
+            )}
+
             {index === breadcrumbs.length - 1 ? (
               <span className="text-white font-medium">{crumb.label}</span>
             ) : (
@@ -103,6 +177,7 @@ function TopBar() {
                 <div className="px-4 py-3 border-b border-slate-700/50">
                   <h3 className="font-semibold text-white">Notifications</h3>
                 </div>
+
                 <div className="max-h-80 overflow-y-auto">
                   {notifications.slice(0, 5).map((notification) => (
                     <div
@@ -111,11 +186,16 @@ function TopBar() {
                         !notification.read ? 'bg-primary-500/5' : ''
                       }`}
                     >
-                      <p className="text-sm text-white font-medium">{notification.title}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">{notification.message}</p>
+                      <p className="text-sm text-white font-medium">
+                        {notification.title}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        {notification.message}
+                      </p>
                     </div>
                   ))}
                 </div>
+
                 <Link
                   to="/notifications"
                   className="block px-4 py-3 text-center text-sm text-primary-400 hover:text-primary-300 transition-colors"
@@ -137,10 +217,12 @@ function TopBar() {
             }}
             className="flex items-center gap-3 p-1.5 rounded-lg hover:bg-surface-hover transition-colors"
           >
-            <Avatar src={currentUser.avatar} name={currentUser.name} size="sm" />
+            <Avatar src={userData.avatar} name={userData.name} size="sm" />
             <div className="hidden md:block text-left">
-              <p className="text-sm font-medium text-white">{currentUser.name}</p>
-              <p className="text-xs text-slate-400 capitalize">{currentUser.role}</p>
+              <p className="text-sm font-medium text-white">{userData.name}</p>
+              <p className="text-xs text-slate-400 capitalize">
+                {userData.role}
+              </p>
             </div>
           </button>
 
@@ -154,9 +236,10 @@ function TopBar() {
                 className="absolute right-0 top-12 w-56 bg-surface-slate rounded-xl border border-slate-700/50 shadow-2xl overflow-hidden"
               >
                 <div className="px-4 py-3 border-b border-slate-700/50">
-                  <p className="font-medium text-white">{currentUser.name}</p>
-                  <p className="text-sm text-slate-400">{currentUser.email}</p>
+                  <p className="font-medium text-white">{userData.name}</p>
+                  <p className="text-sm text-slate-400">{userData.email}</p>
                 </div>
+
                 <div className="py-2">
                   <Link
                     to="/settings"
@@ -166,6 +249,7 @@ function TopBar() {
                     <UserIcon className="w-4 h-4" />
                     Profile
                   </Link>
+
                   <Link
                     to="/settings"
                     className="flex items-center gap-3 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-surface-hover transition-colors"
@@ -174,7 +258,11 @@ function TopBar() {
                     <SettingsIcon className="w-4 h-4" />
                     Settings
                   </Link>
-                  <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-surface-hover transition-colors">
+
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-surface-hover transition-colors"
+                  >
                     <LogOutIcon className="w-4 h-4" />
                     Sign out
                   </button>
@@ -187,5 +275,3 @@ function TopBar() {
     </header>
   )
 }
-
-export { TopBar }

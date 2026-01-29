@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   MailIcon,
@@ -8,26 +8,31 @@ import {
   EyeOffIcon,
   BuildingIcon,
   HomeIcon,
+  PhoneIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { AuthLayout } from '../../components/layout/AuthLayout'
 import { Input } from '../../components/ui/Input'
 import { Button } from '../../components/ui/Button'
 
-function RegisterPage() {
+export function RegisterPage() {
   const navigate = useNavigate()
-  const [showPassword, setShowPassword] = react.useState(false)
-  const [isLoading, setIsLoading] = react.useState(false)
-  const [formData, setFormData] = react.useState({
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
-    role: '', // owner or tenant
+    role: '',
   })
-  const [errors, setErrors] = react.useState({})
 
-  function validateForm() {
+  const [errors, setErrors] = useState({})
+
+  const validateForm = () => {
     const newErrors = {}
 
     if (!formData.role) {
@@ -58,14 +63,28 @@ function RegisterPage() {
     return Object.keys(newErrors).length === 0
   }
 
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+
     if (!validateForm()) return
 
     setIsLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API call
-    setIsLoading(false)
 
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+
+    const userProfile = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      role: formData.role,
+    }
+
+    localStorage.setItem('userProfile', JSON.stringify(userProfile))
+    localStorage.setItem('isAuthenticated', 'true')
+    localStorage.setItem('userEmail', formData.email)
+
+    setIsLoading(false)
     toast.success('Account created successfully!')
     navigate('/')
   }
@@ -81,6 +100,7 @@ function RegisterPage() {
           <label className="block text-sm font-medium text-slate-300 mb-2">
             I am a...
           </label>
+
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -92,17 +112,25 @@ function RegisterPage() {
               }
               className={`
                 p-4 rounded-xl border-2 transition-all duration-200
-                ${formData.role === 'owner' ? 'border-primary-500 bg-primary-500/10' : 'border-slate-600 hover:border-slate-500'}
+                ${
+                  formData.role === 'owner'
+                    ? 'border-primary-500 bg-primary-500/10'
+                    : 'border-slate-600 hover:border-slate-500'
+                }
               `}
             >
               <BuildingIcon
                 className={`w-6 h-6 mx-auto mb-2 ${
-                  formData.role === 'owner' ? 'text-primary-400' : 'text-slate-400'
+                  formData.role === 'owner'
+                    ? 'text-primary-400'
+                    : 'text-slate-400'
                 }`}
               />
               <p
                 className={`text-sm font-medium ${
-                  formData.role === 'owner' ? 'text-white' : 'text-slate-300'
+                  formData.role === 'owner'
+                    ? 'text-white'
+                    : 'text-slate-300'
                 }`}
               >
                 Property Owner
@@ -119,23 +147,32 @@ function RegisterPage() {
               }
               className={`
                 p-4 rounded-xl border-2 transition-all duration-200
-                ${formData.role === 'tenant' ? 'border-primary-500 bg-primary-500/10' : 'border-slate-600 hover:border-slate-500'}
+                ${
+                  formData.role === 'tenant'
+                    ? 'border-primary-500 bg-primary-500/10'
+                    : 'border-slate-600 hover:border-slate-500'
+                }
               `}
             >
               <HomeIcon
                 className={`w-6 h-6 mx-auto mb-2 ${
-                  formData.role === 'tenant' ? 'text-primary-400' : 'text-slate-400'
+                  formData.role === 'tenant'
+                    ? 'text-primary-400'
+                    : 'text-slate-400'
                 }`}
               />
               <p
                 className={`text-sm font-medium ${
-                  formData.role === 'tenant' ? 'text-white' : 'text-slate-300'
+                  formData.role === 'tenant'
+                    ? 'text-white'
+                    : 'text-slate-300'
                 }`}
               >
                 Tenant
               </p>
             </button>
           </div>
+
           {errors.role && (
             <p className="mt-1.5 text-sm text-red-400">{errors.role}</p>
           )}
@@ -144,10 +181,13 @@ function RegisterPage() {
         <Input
           label="Full name"
           type="text"
-          placeholder="John Doe"
+          placeholder="Name"
           value={formData.name}
           onChange={(e) =>
-            setFormData({ ...formData, name: e.target.value })
+            setFormData({
+              ...formData,
+              name: e.target.value,
+            })
           }
           error={errors.name}
           leftIcon={<UserIcon className="w-5 h-5" />}
@@ -159,10 +199,27 @@ function RegisterPage() {
           placeholder="you@example.com"
           value={formData.email}
           onChange={(e) =>
-            setFormData({ ...formData, email: e.target.value })
+            setFormData({
+              ...formData,
+              email: e.target.value,
+            })
           }
           error={errors.email}
           leftIcon={<MailIcon className="w-5 h-5" />}
+        />
+
+        <Input
+          label="Phone number"
+          type="tel"
+          placeholder="(555) 123-4567"
+          value={formData.phone}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              phone: e.target.value,
+            })
+          }
+          leftIcon={<PhoneIcon className="w-5 h-5" />}
         />
 
         <Input
@@ -171,7 +228,10 @@ function RegisterPage() {
           placeholder="••••••••"
           value={formData.password}
           onChange={(e) =>
-            setFormData({ ...formData, password: e.target.value })
+            setFormData({
+              ...formData,
+              password: e.target.value,
+            })
           }
           error={errors.password}
           hint="Must be at least 8 characters"
@@ -197,13 +257,21 @@ function RegisterPage() {
           placeholder="••••••••"
           value={formData.confirmPassword}
           onChange={(e) =>
-            setFormData({ ...formData, confirmPassword: e.target.value })
+            setFormData({
+              ...formData,
+              confirmPassword: e.target.value,
+            })
           }
           error={errors.confirmPassword}
           leftIcon={<LockIcon className="w-5 h-5" />}
         />
 
-        <Button type="submit" className="w-full" size="lg" isLoading={isLoading}>
+        <Button
+          type="submit"
+          className="w-full"
+          size="lg"
+          isLoading={isLoading}
+        >
           Create account
         </Button>
 
@@ -220,5 +288,3 @@ function RegisterPage() {
     </AuthLayout>
   )
 }
-
-export { RegisterPage }

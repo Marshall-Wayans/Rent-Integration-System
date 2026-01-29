@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { MailIcon, LockIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
 import { toast } from 'sonner'
@@ -6,19 +6,28 @@ import { AuthLayout } from '../../components/layout/AuthLayout'
 import { Input } from '../../components/ui/Input'
 import { Button } from '../../components/ui/Button'
 
-function LoginPage() {
+// Valid credentials
+const VALID_CREDENTIALS = {
+  email: 'admin@rentflow.com',
+  password: 'RentFlow2024!',
+}
+
+export function LoginPage() {
   const navigate = useNavigate()
-  const [showPassword, setShowPassword] = React.useState(false)
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [formData, setFormData] = React.useState({
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({
     email: '',
     password: '',
     rememberMe: false,
   })
-  const [errors, setErrors] = React.useState({})
 
-  function validateForm() {
+  const [errors, setErrors] = useState({})
+
+  const validateForm = () => {
     const newErrors = {}
+
     if (!formData.email) {
       newErrors.email = 'Email is required'
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -35,16 +44,39 @@ function LoginPage() {
     return Object.keys(newErrors).length === 0
   }
 
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+
     if (!validateForm()) return
 
     setIsLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API call
-    setIsLoading(false)
 
-    toast.success('Welcome back!')
-    navigate('/')
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // Check credentials
+    if (
+      formData.email === VALID_CREDENTIALS.email &&
+      formData.password === VALID_CREDENTIALS.password
+    ) {
+      localStorage.setItem('isAuthenticated', 'true')
+      localStorage.setItem('userEmail', formData.email)
+
+      if (formData.rememberMe) {
+        localStorage.setItem('rememberMe', 'true')
+      }
+
+      setIsLoading(false)
+      toast.success('Welcome back!')
+      navigate('/')
+    } else {
+      setIsLoading(false)
+      toast.error('Invalid email or password')
+      setErrors({
+        email: 'Invalid credentials',
+        password: 'Invalid credentials',
+      })
+    }
   }
 
   return (
@@ -53,10 +85,25 @@ function LoginPage() {
       subtitle="Sign in to your account to continue"
     >
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Demo Credentials Info */}
+        <div className="bg-primary-500/10 border border-primary-500/30 rounded-lg p-4 mb-6">
+          <p className="text-sm font-medium text-primary-400 mb-2">
+            Demo Credentials:
+          </p>
+          <div className="space-y-1 text-xs text-slate-300">
+            <p>
+              <span className="text-slate-400">Email:</span> admin@rentflow.com
+            </p>
+            <p>
+              <span className="text-slate-400">Password:</span> RentFlow2024!
+            </p>
+          </div>
+        </div>
+
         <Input
           label="Email address"
           type="email"
-          placeholder="you@example.com"
+          placeholder="admin@rentflow.com"
           value={formData.email}
           onChange={(e) =>
             setFormData({
@@ -66,12 +113,13 @@ function LoginPage() {
           }
           error={errors.email}
           leftIcon={<MailIcon className="w-5 h-5" />}
+          autoComplete="email"
         />
 
         <Input
           label="Password"
           type={showPassword ? 'text' : 'password'}
-          placeholder="••••••••"
+          placeholder="Enter your password"
           value={formData.password}
           onChange={(e) =>
             setFormData({
@@ -81,11 +129,13 @@ function LoginPage() {
           }
           error={errors.password}
           leftIcon={<LockIcon className="w-5 h-5" />}
+          autoComplete="current-password"
           rightIcon={
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="hover:text-white transition-colors"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? (
                 <EyeOffIcon className="w-5 h-5" />
@@ -111,6 +161,7 @@ function LoginPage() {
             />
             <span className="text-sm text-slate-400">Remember me</span>
           </label>
+
           <Link
             to="/forgot-password"
             className="text-sm text-primary-400 hover:text-primary-300 transition-colors"
@@ -119,7 +170,12 @@ function LoginPage() {
           </Link>
         </div>
 
-        <Button type="submit" className="w-full" size="lg" isLoading={isLoading}>
+        <Button
+          type="submit"
+          className="w-full"
+          size="lg"
+          isLoading={isLoading}
+        >
           Sign in
         </Button>
 
@@ -136,5 +192,3 @@ function LoginPage() {
     </AuthLayout>
   )
 }
-
-export { LoginPage }
