@@ -11,6 +11,7 @@ import { PropertyDetailPage } from './pages/properties/PropertyDetailPage'
 import { AddPropertyPage } from './pages/properties/AddPropertyPage'
 import { TenantsPage } from './pages/tenants/TenantsPage'
 import { TenantDetailPage } from './pages/tenants/TenantDetailPage'
+import { AddTenantPage } from './pages/tenants/AddTenantPage'
 import { PaymentsPage } from './pages/payments/PaymentsPage'
 import { PaymentDetailPage } from './pages/payments/PaymentDetailPage'
 import { InvoicesPage } from './pages/payments/InvoicesPage'
@@ -79,6 +80,7 @@ export default function App() {
           <Route path="/properties/add" element={<AddPropertyPage />} />
           <Route path="/properties/:id" element={<PropertyDetailPage />} />
           <Route path="/tenants" element={<TenantsPage />} />
+          <Route path="/tenants/add" element={<AddTenantPage />} />
           <Route path="/tenants/:id" element={<TenantDetailPage />} />
           <Route path="/payments" element={<PaymentsPage />} />
           <Route path="/payments/:id" element={<PaymentDetailPage />} />

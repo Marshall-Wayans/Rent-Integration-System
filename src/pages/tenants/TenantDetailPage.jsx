@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -14,16 +14,31 @@ import {
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
 import { Card, CardHeader, CardContent } from '../../components/ui/Card'
-import { Avatar } from '../../components/ui/Avatar'
 import { Tabs, TabPanel } from '../../components/ui/Tabs'
 import { Table } from '../../components/ui/Table'
-import { tenants, payments, maintenanceRequests } from '../../utils/mockData'
-import { formatCurrency, formatDate, formatPhone } from '../../utils/formatters'
+import { tenants as mockTenants, payments, maintenanceRequests } from '../../utils/mockData'
+import { formatCurrency, formatDate } from '../../utils/formatters'
 
 export function TenantDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const tenant = tenants.find((t) => t.id === id)
+  const [tenant, setTenant] = useState(null)
+
+  // Load tenant when component mounts
+  useEffect(() => {
+    // Get saved tenants from localStorage
+    const savedTenants = JSON.parse(localStorage.getItem('tenants') || '[]')
+    
+    // Combine mock data with saved tenants
+    const allTenants = [...mockTenants, ...savedTenants]
+    
+    // Find the tenant with matching ID
+    const foundTenant = allTenants.find((t) => t.id === id)
+    
+    // Update state
+    setTenant(foundTenant)
+  }, [id]) // Runs when component loads or when ID changes
+
   const tenantPayments = payments.filter((p) => p.tenantId === id)
   const tenantMaintenance = maintenanceRequests.filter((m) => m.tenantId === id)
 
@@ -92,14 +107,11 @@ export function TenantDetailPage() {
         <Button variant="ghost" size="sm" onClick={() => navigate('/tenants')}>
           <ArrowLeftIcon className="w-4 h-4" />
         </Button>
-        <div className="flex-1 flex items-center gap-4">
-          <Avatar src={tenant.avatar} name={tenant.name} size="xl" />
-          <div>
-            <h1 className="text-2xl font-bold text-white">{tenant.name}</h1>
-            <p className="text-slate-400">
-              {tenant.propertyName} • Unit {tenant.unitNumber}
-            </p>
-          </div>
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold text-white">{tenant.name}</h1>
+          <p className="text-slate-400">
+            {tenant.propertyName} • Unit {tenant.unitNumber}
+          </p>
         </div>
         <Badge
           variant={
@@ -188,7 +200,7 @@ export function TenantDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm text-slate-400">Phone</p>
-                    <p className="text-white">{formatPhone(tenant.phone)}</p>
+                    <p className="text-white">{tenant.phone}</p>
                   </div>
                 </div>
               </CardContent>

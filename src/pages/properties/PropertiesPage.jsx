@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   PlusIcon,
   SearchIcon,
   MapPinIcon,
-  HomeIcon,
+  HomeIcon, 
   UsersIcon,
 } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
@@ -14,7 +14,7 @@ import { Select } from '../../components/ui/Select'
 import { Badge } from '../../components/ui/Badge'
 import { Card } from '../../components/ui/Card'
 import { EmptyState } from '../../components/ui/EmptyState'
-import { properties } from '../../utils/mockData'
+import { properties as mockProperties } from '../../utils/mockData'
 import { formatCurrency } from '../../utils/formatters'
 
 const statusOptions = [
@@ -37,8 +37,14 @@ export function PropertiesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
+  const [allProperties, setAllProperties] = useState(mockProperties)
 
-  const filteredProperties = properties.filter((property) => {
+  useEffect(() => {
+    const savedProperties = JSON.parse(localStorage.getItem('properties') || '[]')
+    setAllProperties([...mockProperties, ...savedProperties])
+  }, [])
+
+  const filteredProperties = allProperties.filter((property) => {
     const matchesSearch =
       property.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       property.city.toLowerCase().includes(searchQuery.toLowerCase())

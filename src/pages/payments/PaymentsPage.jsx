@@ -13,8 +13,14 @@ import { Select } from '../../components/ui/Select'
 import { Badge } from '../../components/ui/Badge'
 import { Card } from '../../components/ui/Card'
 import { Table } from '../../components/ui/Table'
-import { payments } from '../../utils/mockData'
-import { formatCurrency, formatDate } from '../../utils/formatters'
+import { formatDate } from '../../utils/formatters'
+// Import getAllInvoices from mockData (payments = invoices)
+import { getAllInvoices } from '../../utils/mockData'
+
+// Function to format amounts in Kenyan Shillings
+const formatKES = (amount) => {
+  return `KES ${amount.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
 
 const statusOptions = [
   { value: '', label: 'All Status' },
@@ -26,9 +32,15 @@ const statusOptions = [
 
 export function PaymentsPage() {
   const navigate = useNavigate()
+  
+  // Get payments from mockData (payments are the same as invoices)
+  const payments = getAllInvoices()
+  
+  // State for search and filter
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
 
+  // Filter payments based on search query and status
   const filteredPayments = payments.filter((payment) => {
     const tenant = String(payment.tenantName ?? '')
     const property = String(payment.propertyName ?? '')
@@ -42,16 +54,20 @@ export function PaymentsPage() {
     return matchesSearch && matchesStatus
   })
 
+  // Calculate totals for each status
   const totalCollected = payments
     .filter((p) => p.status === 'paid')
     .reduce((sum, p) => sum + (p.amount ?? 0), 0)
+    
   const totalPending = payments
     .filter((p) => p.status === 'pending')
     .reduce((sum, p) => sum + (p.amount ?? 0), 0)
+    
   const totalOverdue = payments
     .filter((p) => p.status === 'overdue')
     .reduce((sum, p) => sum + (p.amount ?? 0), 0)
 
+  // Function to display the correct status badge
   const getStatusBadge = (status) => {
     switch (status) {
       case 'paid':
@@ -67,6 +83,7 @@ export function PaymentsPage() {
     }
   }
 
+  // Define the columns for the payments table
   const columns = [
     {
       key: 'tenant',
@@ -84,7 +101,7 @@ export function PaymentsPage() {
       key: 'amount',
       header: 'Amount',
       render: (payment) => (
-        <span className="font-semibold text-white">{formatCurrency(payment.amount ?? 0)}</span>
+        <span className="font-semibold text-white">{formatKES(payment.amount ?? 0)}</span>
       ),
     },
     {
@@ -111,11 +128,13 @@ export function PaymentsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-white">Payments</h1>
         <p className="text-slate-400">Track and manage rent payments</p>
       </div>
 
+      {/* Summary Cards showing totals */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[totalCollected, totalPending, totalOverdue].map((amount, i) => {
           const icons = [
@@ -125,6 +144,7 @@ export function PaymentsPage() {
           ]
           const bgColors = ['bg-white/20', 'bg-amber-500/20', 'bg-red-500/20']
           const labels = ['Collected', 'Pending', 'Overdue']
+          
           return (
             <motion.div
               key={i}
@@ -140,7 +160,7 @@ export function PaymentsPage() {
                     {icons[i]}
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">{formatCurrency(amount)}</p>
+                    <p className="text-2xl font-bold text-white">{formatKES(amount)}</p>
                     <p className="text-sm text-slate-400">{labels[i]}</p>
                   </div>
                 </div>
@@ -149,6 +169,7 @@ export function PaymentsPage() {
           )
         })}
 
+        {/* Failed payments card */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <Card className="p-5">
             <div className="flex items-center gap-3">
@@ -164,6 +185,7 @@ export function PaymentsPage() {
         </motion.div>
       </div>
 
+      {/* Search and Filter Section */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <Input
@@ -181,6 +203,7 @@ export function PaymentsPage() {
         />
       </div>
 
+      {/* Payments Table */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
         <Table
           columns={columns}

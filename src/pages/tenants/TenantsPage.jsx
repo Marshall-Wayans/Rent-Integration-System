@@ -1,15 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { PlusIcon, SearchIcon } from 'lucide-react'
+import { PlusIcon, SearchIcon, Trash2Icon } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { Select } from '../../components/ui/Select'
 import { Badge } from '../../components/ui/Badge'
 import { Table } from '../../components/ui/Table'
-import { Avatar } from '../../components/ui/Avatar'
-import { tenants } from '../../utils/mockData'
-import { formatCurrency, formatPhone } from '../../utils/formatters'
+import { tenants as mockTenants } from '../../utils/mockData'
+import { formatCurrency } from '../../utils/formatters'
 
 const statusOptions = [
   { value: '', label: 'All Status' },
@@ -22,8 +21,46 @@ export function TenantsPage() {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
+  const [allTenants, setAllTenants] = useState([])
 
-  const filteredTenants = tenants.filter((tenant) => {
+  // Load tenants when component mounts
+  useEffect(() => {
+    loadTenants()
+  }, []) // Empty array means this runs once when component loads
+
+  // Function to load tenants from localStorage and mockData
+  const loadTenants = () => {
+    // Get saved tenants from localStorage
+    const savedTenants = JSON.parse(localStorage.getItem('tenants') || '[]')
+    
+    // Combine mock data with saved tenants
+    const combined = [...mockTenants, ...savedTenants]
+    
+    // Update state
+    setAllTenants(combined)
+  }
+
+  // Function to delete a tenant
+  const handleDeleteTenant = (tenantId, e) => {
+    e.stopPropagation() // Prevent row click when deleting
+    
+    // Ask for confirmation
+    if (window.confirm('Are you sure you want to remove this tenant?')) {
+      // Get saved tenants from localStorage
+      const savedTenants = JSON.parse(localStorage.getItem('tenants') || '[]')
+      
+      // Remove the tenant with matching ID
+      const updatedTenants = savedTenants.filter(tenant => tenant.id !== tenantId)
+      
+      // Save back to localStorage
+      localStorage.setItem('tenants', JSON.stringify(updatedTenants))
+      
+      // Reload the tenants list
+      loadTenants()
+    }
+  }
+
+  const filteredTenants = allTenants.filter((tenant) => {
     const matchesSearch =
       tenant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tenant.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -49,19 +86,16 @@ export function TenantsPage() {
       key: 'name',
       header: 'Tenant',
       render: (tenant) => (
-        <div className="flex items-center gap-3">
-          <Avatar src={tenant.avatar} name={tenant.name} size="sm" />
-          <div>
-            <p className="font-medium text-white">{tenant.name}</p>
-            <p className="text-sm text-slate-400">{tenant.email}</p>
-          </div>
+        <div>
+          <p className="font-medium text-white">{tenant.name}</p>
+          <p className="text-sm text-slate-400">{tenant.email}</p>
         </div>
       ),
     },
     {
       key: 'phone',
       header: 'Phone',
-      render: (tenant) => formatPhone(tenant.phone),
+      render: (tenant) => tenant.phone,
     },
     {
       key: 'property',
@@ -92,6 +126,29 @@ export function TenantsPage() {
         </span>
       ),
     },
+    {
+      key: 'actions',
+      header: 'Actions',
+      render: (tenant) => {
+        // Check if tenant is from localStorage (can be deleted)
+        const savedTenants = JSON.parse(localStorage.getItem('tenants') || '[]')
+        const canDelete = savedTenants.some(t => t.id === tenant.id)
+        
+        if (!canDelete) {
+          return <span className="text-slate-500 text-sm">-</span>
+        }
+        
+        return (
+          <button
+            onClick={(e) => handleDeleteTenant(tenant.id, e)}
+            className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+            title="Remove tenant"
+          >
+            <Trash2Icon className="w-4 h-4" />
+          </button>
+        )
+      },
+    },
   ]
 
   return (
@@ -102,7 +159,12 @@ export function TenantsPage() {
           <h1 className="text-2xl font-bold text-white">Tenants</h1>
           <p className="text-slate-400">Manage your tenants and their leases</p>
         </div>
-        <Button leftIcon={<PlusIcon className="w-4 h-4" />}>Add Tenant</Button>
+        <Button 
+          leftIcon={<PlusIcon className="w-4 h-4" />}
+          onClick={() => navigate('/tenants/add')}
+        >
+          Add Tenant
+        </Button>
       </div>
 
       {/* Filters */}

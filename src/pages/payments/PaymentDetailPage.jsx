@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import {
   ArrowLeftIcon,
   DownloadIcon,
-  PrinterIcon,
   CheckCircleIcon,
   ClockIcon,
   AlertCircleIcon,
@@ -10,36 +10,236 @@ import {
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
 import { Card, CardHeader, CardContent } from '../../components/ui/Card'
-import { formatCurrency, formatDate, formatDateTime } from '../../utils/formatters'
+import { formatDate, formatDateTime } from '../../utils/formatters'
+// Import functions from mockData
+import { getInvoiceById, markInvoiceAsPaid } from '../../utils/mockData'
 
-
+// Function to format amounts in Kenyan Shillings
+const formatKES = (amount) => {
+  return `KES ${amount.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
 
 export function PaymentDetailPage() {
+  const navigate = useNavigate()
   
-  const payment = {
-    status: 'pending',
-    amount: 1800,
-    dueDate: '2024-02-01',
-    paidDate: null,
-    tenantName: 'John Doe',
-    propertyName: 'Sunset Apartments',
-    unitNumber: '12A',
-    method: 'bank transfer',
+  // Get the invoice/payment ID from the URL
+  const { id } = useParams()
+  
+  // Force component to re-render when payment status changes
+  const [, setRefreshCounter] = useState(0)
+  const forceRefresh = () => setRefreshCounter(prev => prev + 1)
+  
+  // Get the specific invoice/payment by ID from mockData
+  const payment = getInvoiceById(id)
+
+  // If payment not found, show error message
+  if (!payment) {
+    return (
+      <div className="text-center py-12">
+        <h1 className="text-2xl font-bold text-white mb-2">Payment Not Found</h1>
+        <p className="text-slate-400 mb-4">The payment you're looking for doesn't exist.</p>
+        <Button onClick={() => navigate('/payments')}>Back to Payments</Button>
+      </div>
+    )
   }
 
-  const invoice = {
-    id: 'INV-1001',
-    amount: 1800,
-    createdAt: '2024-01-01T10:30:00Z',
-    items: [
-      { description: 'January Rent', amount: 1700 },
-      { description: 'Service Fee', amount: 100 },
-    ],
+  // Function to handle marking payment as paid
+  const handleMarkAsPaid = () => {
+    markInvoiceAsPaid(payment.id) // Update in mockData
+    forceRefresh() // Force component to re-render
+  }
+
+  // Function to download invoice as PDF
+  const handleDownload = () => {
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank')
+    
+    // Generate HTML content with all invoice details
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Invoice ${payment.id}</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              padding: 40px;
+              color: #333;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+              border-bottom: 2px solid #333;
+              padding-bottom: 20px;
+            }
+            .section {
+              margin: 20px 0;
+            }
+            .section-title {
+              font-size: 18px;
+              font-weight: bold;
+              margin-bottom: 10px;
+              color: #000;
+            }
+            .info-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 8px 0;
+              border-bottom: 1px solid #eee;
+            }
+            .label {
+              color: #666;
+            }
+            .value {
+              font-weight: 500;
+            }
+            .items-table {
+              width: 100%;
+              margin: 20px 0;
+              border-collapse: collapse;
+            }
+            .items-table th,
+            .items-table td {
+              padding: 12px;
+              text-align: left;
+              border-bottom: 1px solid #ddd;
+            }
+            .items-table th {
+              background-color: #f5f5f5;
+              font-weight: bold;
+            }
+            .total-row {
+              font-weight: bold;
+              font-size: 18px;
+              background-color: #f9f9f9;
+            }
+            .status-badge {
+              display: inline-block;
+              padding: 4px 12px;
+              border-radius: 4px;
+              font-size: 14px;
+              font-weight: 500;
+            }
+            .status-paid {
+              background-color: #d4edda;
+              color: #155724;
+            }
+            .status-pending {
+              background-color: #fff3cd;
+              color: #856404;
+            }
+            .status-overdue {
+              background-color: #f8d7da;
+              color: #721c24;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>PAYMENT INVOICE</h1>
+            <p>Invoice #${payment.id}</p>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Payment Status</div>
+            <div class="info-row">
+              <span class="label">Status:</span>
+              <span class="status-badge status-${payment.status}">${payment.status.toUpperCase()}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Amount:</span>
+              <span class="value">${formatKES(payment.amount)}</span>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Payment Information</div>
+            <div class="info-row">
+              <span class="label">Tenant:</span>
+              <span class="value">${payment.tenantName}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Property:</span>
+              <span class="value">${payment.propertyName}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Unit:</span>
+              <span class="value">${payment.unitNumber}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Due Date:</span>
+              <span class="value">${formatDate(payment.dueDate)}</span>
+            </div>
+            ${payment.paidDate ? `
+            <div class="info-row">
+              <span class="label">Paid Date:</span>
+              <span class="value">${formatDate(payment.paidDate)}</span>
+            </div>
+            ` : ''}
+            <div class="info-row">
+              <span class="label">Payment Method:</span>
+              <span class="value">${payment.method}</span>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Invoice Details</div>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th style="text-align: right;">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${payment.items.map(item => `
+                  <tr>
+                    <td>${item.description}</td>
+                    <td style="text-align: right;">${formatKES(item.amount)}</td>
+                  </tr>
+                `).join('')}
+                <tr class="total-row">
+                  <td>TOTAL</td>
+                  <td style="text-align: right;">${formatKES(payment.amount)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Timeline</div>
+            <div class="info-row">
+              <span class="label">Invoice Created:</span>
+              <span class="value">${formatDateTime(payment.createdAt)}</span>
+            </div>
+            ${payment.status === 'paid' && payment.paidDate ? `
+            <div class="info-row">
+              <span class="label">Payment Received:</span>
+              <span class="value">${formatDateTime(payment.paidDate)}</span>
+            </div>
+            ` : ''}
+          </div>
+        </body>
+      </html>
+    `
+    
+    // Write content to new window and trigger print dialog
+    printWindow.document.write(htmlContent)
+    printWindow.document.close()
+    
+    // Wait for content to load, then print
+    printWindow.onload = () => {
+      printWindow.print()
+    }
   }
 
   return (
     <div className="space-y-6">
-      <Header invoiceId={invoice.id} />
+      <Header 
+        invoiceId={payment.id} 
+        onDownload={handleDownload}
+        onBack={() => navigate('/payments')}
+      />
       <StatusCard
         status={payment.status}
         amount={payment.amount}
@@ -48,21 +248,20 @@ export function PaymentDetailPage() {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <PaymentInfo payment={payment} />
-        <InvoiceDetails invoice={invoice} />
+        <InvoiceDetails payment={payment} />
       </div>
-      <PaymentTimeline payment={payment} invoice={invoice} />
-      <Actions status={payment.status} />
+      <PaymentTimeline payment={payment} />
+      <Actions status={payment.status} onMarkAsPaid={handleMarkAsPaid} />
     </div>
   )
 }
 
-
-
-function Header({ invoiceId }) {
+// Header with back button and download button
+function Header({ invoiceId, onDownload, onBack }) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm">
+        <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeftIcon className="w-4 h-4" />
         </Button>
         <div>
@@ -71,10 +270,7 @@ function Header({ invoiceId }) {
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <Button variant="outline" leftIcon={<PrinterIcon className="w-4 h-4" />}>
-          Print
-        </Button>
-        <Button variant="outline" leftIcon={<DownloadIcon className="w-4 h-4" />}>
+        <Button variant="outline" leftIcon={<DownloadIcon className="w-4 h-4" />} onClick={onDownload}>
           Download
         </Button>
       </div>
@@ -82,6 +278,7 @@ function Header({ invoiceId }) {
   )
 }
 
+// Icon based on payment status
 function StatusIcon({ status }) {
   switch (status) {
     case 'paid':
@@ -95,6 +292,7 @@ function StatusIcon({ status }) {
   }
 }
 
+// Badge based on payment status
 function StatusBadge({ status }) {
   switch (status) {
     case 'paid':
@@ -108,6 +306,7 @@ function StatusBadge({ status }) {
   }
 }
 
+// Large status card showing amount and status
 function StatusCard({ status, amount, dueDate, paidDate }) {
   return (
     <Card variant="gradient-indigo" className="p-6">
@@ -116,7 +315,7 @@ function StatusCard({ status, amount, dueDate, paidDate }) {
           <StatusIcon status={status} />
           <div>
             <p className="text-3xl font-bold text-white">
-              {formatCurrency(amount)}
+              {formatKES(amount)}
             </p>
             <p className="text-white/70">
               {status === 'paid'
@@ -131,6 +330,7 @@ function StatusCard({ status, amount, dueDate, paidDate }) {
   )
 }
 
+// Card showing payment information
 function PaymentInfo({ payment }) {
   return (
     <Card>
@@ -171,7 +371,8 @@ function PaymentInfo({ payment }) {
   )
 }
 
-function InvoiceDetails({ invoice }) {
+// Card showing invoice line items
+function InvoiceDetails({ payment }) {
   return (
     <Card>
       <CardHeader>
@@ -179,21 +380,21 @@ function InvoiceDetails({ invoice }) {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {invoice.items.map((item, index) => (
+          {payment.items.map((item, index) => (
             <div
               key={index}
               className="flex justify-between py-2 border-b border-slate-700/50 last:border-0"
             >
               <span className="text-slate-300">{item.description}</span>
               <span className="text-white font-medium">
-                {formatCurrency(item.amount)}
+                {formatKES(item.amount)}
               </span>
             </div>
           ))}
           <div className="flex justify-between pt-3 border-t border-slate-700">
             <span className="text-white font-semibold">Total</span>
             <span className="text-white font-bold text-lg">
-              {formatCurrency(invoice.amount)}
+              {formatKES(payment.amount)}
             </span>
           </div>
         </div>
@@ -202,7 +403,8 @@ function InvoiceDetails({ invoice }) {
   )
 }
 
-function PaymentTimeline({ payment, invoice }) {
+// Timeline showing invoice creation and payment
+function PaymentTimeline({ payment }) {
   return (
     <Card>
       <CardHeader>
@@ -217,7 +419,7 @@ function PaymentTimeline({ payment, invoice }) {
             <div>
               <p className="text-white font-medium">Invoice Created</p>
               <p className="text-sm text-slate-400">
-                {formatDateTime(invoice.createdAt)}
+                {formatDateTime(payment.createdAt)}
               </p>
             </div>
           </div>
@@ -240,11 +442,16 @@ function PaymentTimeline({ payment, invoice }) {
   )
 }
 
-function Actions({ status }) {
+// Action buttons (Mark as Paid)
+function Actions({ status, onMarkAsPaid }) {
+  // Only show the button if payment is not paid
   if (status === 'paid') return null
+  
   return (
     <div className="flex justify-end">
-      <Button size="lg">Mark as Paid</Button>
+      <Button size="lg" onClick={onMarkAsPaid}>
+        Mark as Paid
+      </Button>
     </div>
   )
 }

@@ -3,10 +3,8 @@ export const currentUser = {
   id: 'u1',
   name: 'Alex Morgan',
   email: 'alex@rentflow.com',
-  phone: '5551234567',
+  phone: '0701234567',
   role: 'owner',
-  avatar:
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
   createdAt: '2023-01-15',
 }
 
@@ -192,15 +190,13 @@ export const units = [
   },
 ]
 
-// Tenants
+// Tenants - NO AVATARS, KENYAN PHONE NUMBERS
 export const tenants = [
   {
     id: 't1',
     name: 'Sarah Johnson',
     email: 'sarah.j@email.com',
-    phone: '5559876543',
-    avatar:
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
+    phone: '0712345678',
     unitId: 'u1',
     propertyId: 'p1',
     propertyName: 'Sunset Apartments',
@@ -216,9 +212,7 @@ export const tenants = [
     id: 't2',
     name: 'Michael Chen',
     email: 'mchen@email.com',
-    phone: '5558765432',
-    avatar:
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+    phone: '0723456789',
     unitId: 'u2',
     propertyId: 'p1',
     propertyName: 'Sunset Apartments',
@@ -234,9 +228,7 @@ export const tenants = [
     id: 't3',
     name: 'Emily Davis',
     email: 'emily.d@email.com',
-    phone: '5557654321',
-    avatar:
-      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+    phone: '0734567890',
     unitId: 'u4',
     propertyId: 'p1',
     propertyName: 'Sunset Apartments',
@@ -252,9 +244,7 @@ export const tenants = [
     id: 't4',
     name: 'James Wilson',
     email: 'jwilson@email.com',
-    phone: '5556543210',
-    avatar:
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
+    phone: '0745678901',
     unitId: 'u5',
     propertyId: 'p2',
     propertyName: 'Harbor View Condos',
@@ -270,9 +260,7 @@ export const tenants = [
     id: 't5',
     name: 'Lisa Anderson',
     email: 'lisa.a@email.com',
-    phone: '5555432109',
-    avatar:
-      'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face',
+    phone: '0756789012',
     unitId: 'u6',
     propertyId: 'p2',
     propertyName: 'Harbor View Condos',
@@ -288,9 +276,7 @@ export const tenants = [
     id: 't6',
     name: 'David Kim',
     email: 'dkim@email.com',
-    phone: '5554321098',
-    avatar:
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face',
+    phone: '0767890123',
     unitId: 'u7',
     propertyId: 'p3',
     propertyName: 'Downtown Lofts',
@@ -304,151 +290,81 @@ export const tenants = [
   },
 ]
 
-// Payments
-export const payments = [
+// UPDATED: Invoices with sequential numbers and payment method
+// Note: Invoices and Payments are the same - one invoice = one payment
+export let invoices = [
   {
-    id: 'pay1',
+    id: 'INV-0001',
     tenantId: 't1',
     tenantName: 'Sarah Johnson',
-    propertyId: 'p1',
     propertyName: 'Sunset Apartments',
     unitNumber: '101',
     amount: 1800,
     dueDate: '2024-01-01',
     paidDate: '2023-12-28',
     status: 'paid',
-    method: 'card',
-    invoiceId: 'inv1',
+    method: 'M-Pesa',
+    items: [
+      { description: 'Monthly Rent', amount: 1700 },
+      { description: 'Service Fee', amount: 100 }
+    ],
+    createdAt: '2023-12-15T10:00:00Z',
   },
   {
-    id: 'pay2',
+    id: 'INV-0002',
     tenantId: 't2',
     tenantName: 'Michael Chen',
-    propertyId: 'p1',
     propertyName: 'Sunset Apartments',
     unitNumber: '102',
     amount: 2200,
     dueDate: '2024-01-01',
+    paidDate: null,
     status: 'pending',
-    invoiceId: 'inv2',
+    method: 'bank transfer',
+    items: [
+      { description: 'Monthly Rent', amount: 2100 },
+      { description: 'Service Fee', amount: 100 }
+    ],
+    createdAt: '2023-12-15T11:00:00Z',
   },
   {
-    id: 'pay3',
+    id: 'INV-0003',
     tenantId: 't3',
     tenantName: 'Emily Davis',
-    propertyId: 'p1',
     propertyName: 'Sunset Apartments',
     unitNumber: '202',
     amount: 3000,
     dueDate: '2023-12-01',
+    paidDate: null,
     status: 'overdue',
-    invoiceId: 'inv3',
+    method: 'bank transfer',
+    items: [
+      { description: 'Monthly Rent', amount: 2900 },
+      { description: 'Service Fee', amount: 100 }
+    ],
+    createdAt: '2023-11-15T09:00:00Z',
   },
   {
-    id: 'pay4',
-    tenantId: 't3',
-    tenantName: 'Emily Davis',
-    propertyId: 'p1',
-    propertyName: 'Sunset Apartments',
-    unitNumber: '202',
-    amount: 3000,
-    dueDate: '2024-01-01',
-    status: 'overdue',
-    invoiceId: 'inv4',
-  },
-  {
-    id: 'pay5',
+    id: 'INV-0004',
     tenantId: 't4',
     tenantName: 'James Wilson',
-    propertyId: 'p2',
     propertyName: 'Harbor View Condos',
     unitNumber: 'A1',
     amount: 3000,
     dueDate: '2024-01-01',
     paidDate: '2024-01-01',
     status: 'paid',
-    method: 'bank',
-    invoiceId: 'inv5',
-  },
-  {
-    id: 'pay6',
-    tenantId: 't5',
-    tenantName: 'Lisa Anderson',
-    propertyId: 'p2',
-    propertyName: 'Harbor View Condos',
-    unitNumber: 'A2',
-    amount: 3500,
-    dueDate: '2024-01-01',
-    paidDate: '2023-12-30',
-    status: 'paid',
-    method: 'card',
-    invoiceId: 'inv6',
-  },
-  {
-    id: 'pay7',
-    tenantId: 't6',
-    tenantName: 'David Kim',
-    propertyId: 'p3',
-    propertyName: 'Downtown Lofts',
-    unitNumber: '1A',
-    amount: 3500,
-    dueDate: '2024-01-01',
-    status: 'pending',
-    invoiceId: 'inv7',
+    method: 'M-Pesa',
+    items: [
+      { description: 'Monthly Rent', amount: 2850 },
+      { description: 'Service Fee', amount: 150 }
+    ],
+    createdAt: '2023-12-15T12:00:00Z',
   },
 ]
 
-// Invoices
-export const invoices = [
-  {
-    id: 'inv1',
-    tenantId: 't1',
-    tenantName: 'Sarah Johnson',
-    propertyName: 'Sunset Apartments',
-    unitNumber: '101',
-    amount: 1800,
-    dueDate: '2024-01-01',
-    status: 'paid',
-    items: [{ description: 'Monthly Rent - January 2024', amount: 1800 }],
-    createdAt: '2023-12-15',
-  },
-  {
-    id: 'inv2',
-    tenantId: 't2',
-    tenantName: 'Michael Chen',
-    propertyName: 'Sunset Apartments',
-    unitNumber: '102',
-    amount: 2200,
-    dueDate: '2024-01-01',
-    status: 'pending',
-    items: [{ description: 'Monthly Rent - January 2024', amount: 2200 }],
-    createdAt: '2023-12-15',
-  },
-  {
-    id: 'inv3',
-    tenantId: 't3',
-    tenantName: 'Emily Davis',
-    propertyName: 'Sunset Apartments',
-    unitNumber: '202',
-    amount: 3000,
-    dueDate: '2023-12-01',
-    status: 'overdue',
-    items: [{ description: 'Monthly Rent - December 2023', amount: 3000 }],
-    createdAt: '2023-11-15',
-  },
-  {
-    id: 'inv4',
-    tenantId: 't3',
-    tenantName: 'Emily Davis',
-    propertyName: 'Sunset Apartments',
-    unitNumber: '202',
-    amount: 3000,
-    dueDate: '2024-01-01',
-    status: 'overdue',
-    items: [{ description: 'Monthly Rent - January 2024', amount: 3000 }],
-    createdAt: '2023-12-15',
-  },
-]
+// UPDATED: Payments array now references invoices (they're the same data)
+export const payments = invoices
 
 // Maintenance Requests
 export const maintenanceRequests = [
@@ -682,3 +598,91 @@ export const recentActivity = [
     time: '3 days ago',
   },
 ]
+
+// =====================================================
+// HELPER FUNCTIONS TO MANAGE INVOICE DATA
+// =====================================================
+
+/**
+ * Get the next sequential invoice number
+ * Looks at all existing invoices and returns the next number
+ */
+export function getNextInvoiceNumber() {
+  if (invoices.length === 0) return 'INV-0001'
+  
+  const numbers = invoices.map(inv => {
+    const num = inv.id.replace('INV-', '')
+    return parseInt(num, 10)
+  })
+  
+  const maxNumber = Math.max(...numbers)
+  const nextNumber = maxNumber + 1
+  
+  return `INV-${String(nextNumber).padStart(4, '0')}`
+}
+
+/**
+ * Add a new invoice to the list
+ * @param {Object} invoiceData - The invoice data to add
+ * @returns {Object} The newly created invoice
+ */
+export function addInvoice(invoiceData) {
+  const newInvoice = {
+    ...invoiceData,
+    id: getNextInvoiceNumber(),
+    createdAt: new Date().toISOString(),
+    status: 'pending',
+    paidDate: null,
+  }
+  
+  invoices = [newInvoice, ...invoices]
+  return newInvoice
+}
+
+/**
+ * Update an existing invoice
+ * @param {string} invoiceId - The ID of the invoice to update
+ * @param {Object} updates - The fields to update
+ */
+export function updateInvoice(invoiceId, updates) {
+  invoices = invoices.map(inv => 
+    inv.id === invoiceId ? { ...inv, ...updates } : inv
+  )
+}
+
+/**
+ * Mark an invoice as paid
+ * @param {string} invoiceId - The ID of the invoice to mark as paid
+ */
+export function markInvoiceAsPaid(invoiceId) {
+  invoices = invoices.map(inv => 
+    inv.id === invoiceId 
+      ? { ...inv, status: 'paid', paidDate: new Date().toISOString() }
+      : inv
+  )
+}
+
+/**
+ * Delete an invoice
+ * @param {string} invoiceId - The ID of the invoice to delete
+ */
+export function deleteInvoice(invoiceId) {
+  invoices = invoices.filter(inv => inv.id !== invoiceId)
+}
+
+/**
+ * Get a single invoice by ID
+ * @param {string} invoiceId - The ID of the invoice to find
+ * @returns {Object|undefined} The invoice or undefined if not found
+ */
+export function getInvoiceById(invoiceId) {
+  return invoices.find(inv => inv.id === invoiceId)
+}
+
+/**
+ * Get all invoices
+ * @returns {Array} All invoices
+ */
+export function getAllInvoices() {
+  return invoices
+}

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -6,7 +6,7 @@ import {
   EditIcon,
   MapPinIcon,
   HomeIcon,
-  UsersIcon,
+  UsersIcon, 
   DollarSignIcon,
   CalendarIcon,
   PlusIcon,
@@ -17,13 +17,23 @@ import { Card, CardHeader, CardContent } from '../../components/ui/Card'
 import { Table } from '../../components/ui/Table'
 import { Avatar } from '../../components/ui/Avatar'
 import { Tabs, TabPanel } from '../../components/ui/Tabs'
-import { properties, units, tenants } from '../../utils/mockData'
+import { properties as mockProperties, units, tenants } from '../../utils/mockData'
 import { formatCurrency, formatDate } from '../../utils/formatters'
 
 export function PropertyDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const property = properties.find((p) => p.id === id)
+  const [property, setProperty] = useState(null)
+
+  useEffect(() => {
+    let foundProperty = mockProperties.find((p) => p.id === id)
+    if (!foundProperty) {
+      const savedProperties = JSON.parse(localStorage.getItem('properties') || '[]')
+      foundProperty = savedProperties.find((p) => p.id === id)
+    }
+    setProperty(foundProperty)
+  }, [id])
+
   const propertyUnits = units.filter((u) => u.propertyId === id)
   const propertyTenants = tenants.filter((t) => t.propertyId === id)
 

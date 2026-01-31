@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon, UploadIcon } from 'lucide-react';
+import { ArrowLeftIcon, UploadIcon, XIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -13,6 +13,8 @@ const propertyTypes = [
   { value: 'house', label: 'House' },
   { value: 'condo', label: 'Condo' },
   { value: 'commercial', label: 'Commercial' },
+  { value: 'bnb', label: 'BnB' },
+  { value: 'penthouse', label: 'Penthouse' },
 ];
 
 const defaultAmenities = [
@@ -22,6 +24,7 @@ const defaultAmenities = [
 export function AddPropertyPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     type: '',
@@ -48,11 +51,57 @@ export function AddPropertyPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please upload an image file');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Image size must be less than 10MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
+    
+    const newProperty = {
+      id: `prop-${Date.now()}`,
+      name: formData.name,
+      type: formData.type,
+      address: formData.address,
+      city: formData.city,
+      state: formData.state,
+      zipCode: formData.zipCode,
+      units: parseInt(formData.units),
+      occupiedUnits: 0,
+      description: formData.description,
+      amenities: formData.amenities,
+      image: imagePreview || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800',
+      status: 'active',
+      monthlyRevenue: 0,
+      createdAt: new Date().toISOString(),
+    };
+    
+    const existingProperties = JSON.parse(localStorage.getItem('properties') || '[]');
+    const updatedProperties = [...existingProperties, newProperty];
+    localStorage.setItem('properties', JSON.stringify(updatedProperties));
+    
     setIsLoading(false);
     toast.success('Property added successfully!');
     navigate('/properties');
@@ -138,13 +187,13 @@ export function AddPropertyPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Input
                 label="City"
-                placeholder="Los Angeles"
+                placeholder="Where Exactly"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                 error={errors.city}
               />
               <Input
-                label="State"
+                label="County/Country"
                 placeholder="CA"
                 value={formData.state}
                 onChange={(e) => setFormData({ ...formData, state: e.target.value })}
@@ -167,11 +216,36 @@ export function AddPropertyPage() {
             <h3 className="text-lg font-semibold text-white">Images</h3>
           </CardHeader>
           <CardContent>
-            <div className="border-2 border-dashed border-slate-600 rounded-xl p-8 text-center hover:border-primary-500 transition-colors cursor-pointer">
-              <UploadIcon className="w-10 h-10 text-slate-400 mx-auto mb-3" />
-              <p className="text-slate-300 font-medium mb-1">Click to upload images</p>
-              <p className="text-sm text-slate-500">PNG, JPG up to 10MB</p>
-            </div>
+            {imagePreview ? (
+              <div className="relative">
+                <img 
+                  src={imagePreview} 
+                  alt="Property preview" 
+                  className="w-full h-64 object-cover rounded-xl"
+                />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute top-3 right-3 p-2 bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+                >
+                  <XIcon className="w-5 h-5 text-white" />
+                </button>
+              </div>
+            ) : (
+              <label className="block">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <div className="border-2 border-dashed border-slate-600 rounded-xl p-8 text-center hover:border-primary-500 transition-colors cursor-pointer">
+                  <UploadIcon className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+                  <p className="text-slate-300 font-medium mb-1">Click to upload images</p>
+                  <p className="text-sm text-slate-500">PNG, JPG up to 10MB</p>
+                </div>
+              </label>
+            )}
           </CardContent>
         </Card>
 
